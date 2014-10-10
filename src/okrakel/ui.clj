@@ -1,4 +1,4 @@
-(ns testreagent.se2
+(ns okrakel.ui
   (:require
     [cljs.core.async.macros :refer [go-loop]]))
 
