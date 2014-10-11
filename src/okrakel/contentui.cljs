@@ -14,25 +14,48 @@
   (reify
     om/IRender
     (render [_]
-      (let [event-bus (om/get-shared owner :event-bus)]
+      (let [event-bus (om/get-shared owner :event-bus)
+            user (a/user app-model)
+            name (:name user)
+            points "78"
+            ranking 449
+            ]
         (html
-         [:u {:class "table-view"}
-          [:li {:class "table-view-cell"}
-           [:a {:class "navigate-right"
-                :on-click (fn [e] (async/put! event-bus [:select-view :ranking]))}
-            "Rangliste"]]
-          [:li {:class "table-view-cell"}
-           [:a {:class "navigate-right"
-                :on-click (fn [e] (async/put! event-bus [:select-view :matchdays]))}
-            "Spieltage"]]
-          [:li {:class "table-view-cell"}
-           [:a {:class "navigate-right"
-                :on-click (fn [e] (async/put! event-bus [:select-view :groups]))}
-            "Gruppen"]]
-          [:li {:class "table-view-cell"}
-           [:a {:class "navigate-right"
-                :on-click (fn [e] (async/put! event-bus [:select-view :settings]))}
-            "Einstellungen"]]
+         [:div
+          [:div {:class "card"}
+           [:div {:class "input-group"}
+            [:div {:class "input-row"}
+             [:label "Name"]
+             [:input {:type "text"
+                      :value name}]]
+            [:div {:class "input-row"}
+             [:label "Punkte"]
+             [:input {:type "text"
+                      :value points}]]
+            [:div {:class "input-row"}
+             [:label "Platzierung"]
+             [:input {:type "text"
+                      :value ranking}]]]
+           [:p]
+           [:button {:class "btn btn-primary btn-block"
+                     :on-click (fn [e] (async/put! event-bus [:select-view :matchdays]))}
+            "Jetzt tippen"]]
+          [:div {:class "card"}
+           [:u {:class "table-view"}
+            [:li {:class "table-view-divider"} "Gruppen"]
+            [:li {:class "table-view-cell"}
+             [:a {:class "navigate"
+                  :on-click (fn [e] (async/put! event-bus [:select-view :matchdays]))}
+              "Hinter Thailand"]]
+            ]]
+          [:div {:class "card"}
+           [:u {:class "table-view"}
+            [:li {:class "table-view-cell"}
+             [:a {:class "navigate-right"
+                  :on-click (fn [e] (async/put! event-bus [:select-view :matchdays]))}
+              "Spieltage"]]
+            ]]
+          
           ]
          )))))
 
@@ -43,25 +66,21 @@
       (let [event-bus (om/get-shared owner :event-bus)]
         (html
          [:u {:class "table-view"}
-          [:li {:class "table-view-cell"}
-           [:a {:class "navigate-right"
-                :on-click (fn [e] (async/put! event-bus [:select-view :ranking]))}
-            "Rangliste"]]
-          [:li {:class "table-view-cell"}
-           [:a {:class "navigate-right"
-                :on-click (fn [e] (async/put! event-bus [:select-view :matchdays]))}
-            "Spieltage"]]
-          [:li {:class "table-view-cell"}
-           [:a {:class "navigate-right"
-                :on-click (fn [e] (async/put! event-bus [:select-view :groups]))}
-            "Gruppen"]]
-          [:li {:class "table-view-cell"}
-           [:a {:class "navigate-right"
-                :on-click (fn [e] (async/put! event-bus [:select-view :settings]))}
-            "Einstellungen"]]
-          ]
-         ))))
-)
+          (for [rank (:ranking app-model)]
+            (for [user-id (:user-ids rank)]
+              (let [user (a/user app-model user-id)
+                    label (str  (:rank rank) ". " (:name user))
+                    badge-label (str (:points rank) " Pkt.")]
+                [:li {:class "table-view-cell"}
+                 [:a {:class "navigate-right"
+                      :on-click (fn [e] (async/put! event-bus [:select-view :ranking]))}
+                  label
+                  [:span {:class "badge"} badge-label]]])
+              )
+            
+            
+            )]
+         )))))
 
 (defn matchdays-view [app-model owner]
   (om/component (dom/p nil "Spieltage")))
@@ -72,6 +91,9 @@
 (defn settings-view [app-model owner]
   (om/component (dom/p nil "Einstellungen")))
 
+(defn table-view [app-model owner]
+  (om/component (dom/p nil "Tabelle")))
+
 (defn select-view [app-model owner ]
   (let [p (:page app-model)]
     (cond
@@ -79,5 +101,6 @@
      (= p :matchdays) (matchdays-view app-model owner)
      (= p :groups)    (groups-view app-model owner)
      (= p :settings)  (settings-view app-model owner)
+     (= p :table)     (table-view app-model owner)
      true             (home-view app-model owner)   
      )))

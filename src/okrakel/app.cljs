@@ -12,19 +12,42 @@
 (defn activate-view [app-model new-view]
   (assoc app-model :page new-view))
 
+
+(defn user
+  ([app-model id]
+     (->> app-model
+          :users
+          (filter #(= id (:id %)))
+          first))
+  ([app-model]
+     (user app-model (get-in app-model [:user :id]))))
+
 (defn game-init
   ""
   []
   {:page :home
-   :pages {:home      {:title "Okrakels Tippspiel"}
+   :pages {:home      {:title "Meine Daten"}
            :ranking   {:title "Rangliste"}
            :matchdays {:title "Spieltage"}
            :groups    {:title "Gruppen"}
            :settings  {:title "Einstellungen"}
+           :table     {:title "Bundesliga-Tabelle"}
            }
-   :user {:name "Paul Krake"
-          :groups "Hinter Thailand"
-          :logged-in true}
+   :user {:id 2}
+
+   :users [{:id 1 :name "Hummi"      }
+           {:id 2 :name "Paul Krake" }]
+   
+   :ranking [{:rank 1 :points 87 :user-ids [1]}
+             {:rank 2 :points 78 :user-ids [2]}]
+   
+   :groups [{:id 1 :name "Hinter Thailand"
+             :member-ids [1 2] }]
+
+   :spielplan [{:spieltag 1
+                :spiele []}
+               ]
+   
    })
 
 

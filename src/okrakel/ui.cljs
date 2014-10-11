@@ -8,7 +8,8 @@
             [sablono.core :as html :refer-macros [html]]
             [okrakel.app :as a]
             [okrakel.contentui :as cu]
-            [goog.events :as events])
+            [goog.events :as events]
+            [clojure.string])
   (:import [goog.events EventType]))
 
 (enable-console-print!)
@@ -26,22 +27,38 @@
     (render [_]
       (let [event-bus (om/get-shared owner :event-bus)]
         (html
-         [:h1 {:class "title" }
-          (get-in app-model [:pages (:page app-model) :title])])))))
+         [:span
+          [:a {:class "icon icon-gear pull-right"
+               :on-click (fn [e] (async/put! event-bus
+                                                [:select-view :settings]))}]  
+          [:h1 {:class "title" }
+           (get-in app-model [:pages (:page app-model) :title])]])))))
 
 (defn nav [app-model owner ]
   (reify
     om/IRender
     (render [_]
-      (let [event-bus (om/get-shared owner :event-bus)]
+      (let [event-bus (om/get-shared owner :event-bus)
+            tabs [{:page :home
+                   :icon "icon-home"
+                   :label "Home"}
+                  {:page :ranking
+                   :icon "icon-more-vertical"
+                   :label "Ranking"}
+                  {:page :table
+                   :icon "icon-list"
+                   :label "Tabelle"}]]
         (html
          [:nav {:class "bar bar-tab"}
-          [:a {:class "tab-item active"}
-           [:span {:class "icon icon-home"}]
-           [:span {:class "tab-label"} "Home"]]
-          [:a {:class "tab-item"}
-           [:span {:class "icon icon-person"}]
-           [:span {:class "tab-label"} "Profile"]]
+          (for [tab tabs]
+            (let [active (= (:page tab) (:page app-model))
+                  a-classes (if active "tab-item active" "tab-item")
+                  icon-classes (clojure.string/join " " ["icon" (:icon tab)])]
+              [:a {:class a-classes
+                   :on-click (fn [e] (async/put! event-bus
+                                                [:select-view (:page tab)]))}
+               [:span {:class icon-classes}]
+               [:span {:class "tab-label"} (:label tab)]]))
           ])))))
 
 ;; when game is started
