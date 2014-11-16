@@ -1,0 +1,62 @@
+(ns okrakel.pages.home
+  (:require-macros [okrakel.ui :refer [go-loop-sub]]
+                   [cljs.core.async.macros :refer [go go-loop]])
+  (:require [cljs.core.async :as async]
+            [om.core :as om  :include-macros true]
+            [om.dom :as dom :include-macros true]
+            ;[ajax.core :refer (GET)]
+            [sablono.core :as html :refer-macros [html]]
+            [okrakel.app :as a]
+            [goog.events :as events])
+  (:import [goog.events EventType]))
+
+(defn home-view [app-model owner ]
+  (reify
+    om/IRender
+    (render [_]
+      (let [event-bus (om/get-shared owner :event-bus)
+            user (a/user app-model)
+            name (:name user)
+            points "78"
+            ranking 449
+            ]
+        (html
+         [:div
+          [:div {:class "card"}
+           [:div {:class "input-group"}
+            [:div {:class "input-row"}
+             [:label "Name"]
+             [:input {:type "text"
+                      :value name}]]
+            [:div {:class "input-row"}
+             [:label "Punkte"]
+             [:input {:type "text"
+                      :value points}]]
+            [:div {:class "input-row"}
+             [:label "Platzierung"]
+             [:input {:type "text"
+                      :value ranking}]]]
+           [:p]
+           [:button {:class "btn btn-primary btn-block"
+                     :on-click (fn [e] (async/put! event-bus [:select-view :matchdays]))}
+            "Jetzt tippen"]]
+          [:div {:class "card"}
+           [:u {:class "table-view"}
+            [:li {:class "table-view-divider"} "Gruppen"]
+            [:li {:class "table-view-cell"}
+             [:a {:class "navigate"
+                  :on-click (fn [e] (async/put! event-bus [:select-view :matchdays]))}
+              "Hinter Thailand"]]
+            ]]
+          [:div {:class "card"}
+           [:u {:class "table-view"}
+            [:li {:class "table-view-cell"}
+             [:a {:class "navigate-right"
+                  :on-click (fn [e] (async/put! event-bus [:select-view :matchdays]))}
+              "Spieltage"]]
+            ]]
+          
+          ]
+         )))))
+
+

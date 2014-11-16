@@ -111,10 +111,10 @@
                  :user/name "Hummi"}
                 {:db/id -3
                  :user/id 2
-                 :user/name "Paul Krake"}
-                {:db/id -4
-                 :user/id 3
-                 :user/name "Chipie 1967"}
+                 :user/name "Paul Krake"
+                 {:db/id -4
+                  :user/id 3
+                  :user/name "Chipie 1967"}}
                 {:db/id -5
                  :user/id 4
                  :user/name "Max 2003"} 
