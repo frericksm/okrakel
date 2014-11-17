@@ -27,6 +27,10 @@
 (go-loop-sub event-bus-pub :reset-game [_]
              (a/game-init))
 
+;; when user logs in
+(go-loop-sub event-bus-pub :login [_ name]
+             (a/login name))
+
 ;; Start the app
 (defn run []
   (async/put! event-bus [:reset-game])

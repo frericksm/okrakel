@@ -12,17 +12,15 @@
   (:import [goog.events EventType]))
 
 (enable-console-print!)
- 
+
 (def schema
   {:app/page  {}
    :app/group {}
-   :app/user  {}
-   :app/me    {}
+   :app/user  {:db/valueType :db.type/ref}
+   :app/login-name   {}
    
    :user/id         {}
    :user/name       {}
-   :user/me         {}
-   :user/state      {}
    :ranking/rank    {}
    :ranking/points  {}
    :ranking/users   {:db/valueType :db.type/ref
@@ -47,26 +45,45 @@
     ([this _] this)
     ([this _ _] this)))
 
+(defn- app-entity-id [db]
+  (ffirst (d/q '[:find  ?e
+                 :where [?e :app/page]]
+               db)))
+
+(defn login-name [db]
+  (ffirst (d/q '[:find ?id
+                 :where [?e :app/login-name ?id]]
+               db)))
+
+(defn login [name]
+  (let [e (ffirst (d/q '[:find  ?e
+                         :in $ ?name
+                         :where [?e :user/name ?name]]
+                       @conn name))
+        a (app-entity-id @conn)]
+    (if (not (nil? e))
+      (d/transact! conn [ {:db/id a
+                           :app/user e} ]))))
+
 (defn active-view [db]
   (ffirst (d/q '[:find ?id
-                 :where [?e :app/page ?id]]
+                 :where [_ :app/page ?id]]
                db)))
 
 (defn activate-view [new-view]
-  (let [e (ffirst (d/q '[:find  ?e
-                         :where [?e :app/page]]
-                       @conn))]
+  (let [e (app-entity-id @conn)]
     (d/transact! conn [ {:db/id e
                          :app/page new-view} ])))
 
 (defn user
-  ([db] (as-> (d/q '[:find  ?e 
-                    :where
-                     [?e :user/me true]]
-                   db) x
-                   (ffirst x)
-                   (if (not (nil? x))
-                     (d/entity db x))))
+  ([db] (as-> (d/q '[:find  ?u
+                     :where
+                     [_ :app/user ?u]]
+                   db)
+              x
+              (ffirst x)
+              (if (not (nil? x))
+                (d/entity db x))))
   
   ([db id] (if (not (nil? id))
              (->> (d/q '[:find  ?e

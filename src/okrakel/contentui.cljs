@@ -20,7 +20,7 @@
             )
   (:import [goog.events EventType]))
 
-(def pages {:login     {:title "Anmelden"}
+(def pages {:login     {:title "Start"}
             :home      {:title "Übersicht"}
             :ranking   {:title "Rangliste"}
             :matchdays {:title "Spieltage"}
@@ -38,6 +38,7 @@
      (= p :groups)    (okrakel.pages.groups/view db owner)
      (= p :settings)  (okrakel.pages.settings/view db owner)
      (= p :table)     (okrakel.pages.table/view db owner)
-     :else            (okrakel.pages.home/view db owner)   
+     (= p :home)      (okrakel.pages.home/view db owner)
+     :else            (okrakel.pages.login/view db owner)   
      ))
   )
