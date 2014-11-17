@@ -39,5 +39,5 @@
            [:button {:class "btn btn-positive btn-block"
                      :on-click (fn [e] (login event-bus name))}
             "Login"]
-          ]])))
+           ]])))
     ))
