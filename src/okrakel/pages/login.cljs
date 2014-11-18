@@ -14,7 +14,22 @@
 (defn- login [chan name]
   (async/put! chan [:login name]))
 
-(defn- textarea-keydown [callback]
+(defn- update-login-name [chan name]
+  (async/put! chan [:update 1 :app/login-name name]))
+
+(defn- button-clicked [callback]
+  (fn [e]
+    (do
+      (callback)
+      (.preventDefault e))))
+
+(defn- text-change [callback]
+  (fn [e]
+    (do
+      (callback (.. e -target -value))
+      (.preventDefault e))))
+
+(defn- text-keydown [callback]
   (fn [e]
     (if (and (== (.-keyCode e) 13) ;; enter
              (not (.-shiftKey e))) ;; no shift
@@ -35,9 +50,10 @@
          [:div {:class "card"}
           [:form
            [:input {:type "text" :placeholder "Name" :value name
-                    :on-key-down (textarea-keydown #(login event-bus %))}]
+                    :on-key-down (text-keydown #(login event-bus %))
+                    :on-change (text-change #(update-login-name event-bus %))}]
            [:button {:class "btn btn-positive btn-block"
-                     :on-click (fn [e] (login event-bus name))}
-            "Login"]
+                     :on-click (button-clicked (partial login event-bus name))}
+            "Login"] 
            ]])))
     ))

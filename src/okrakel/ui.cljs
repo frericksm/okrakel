@@ -27,9 +27,14 @@
 (go-loop-sub event-bus-pub :start [_]
              (a/game-init))
 
+;; when game is started
+(go-loop-sub event-bus-pub :update [_ e a v]
+             (a/update e a v))
+
 ;; when user logs in
 (go-loop-sub event-bus-pub :login [_ name]
-             (a/login name))
+             (if (not (nil? (a/login name)))
+               (async/put! event-bus [:select-view :home])))
 
 ;; Start the app
 (defn run []

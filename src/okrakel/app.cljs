@@ -50,33 +50,6 @@
                  :where [?e :app/page]]
                db)))
 
-(defn login-name [db]
-  (ffirst (d/q '[:find ?id
-                 :where [?e :app/login-name ?id]]
-               db)))
-
-(defn login [name]
-  (let [e (ffirst (d/q '[:find  ?e
-                         :in $ ?name
-                         :where [?e :user/name ?name]]
-                       @conn name))
-        a (app-entity-id @conn)]
-    (if (not (nil? e))
-      (d/transact! conn [ {:db/id a
-                           :app/user e} ]))))
-
-(defn active-view [db]
-  (let [page (ffirst (d/q '[:find ?page
-                             :where [_ :app/page ?page]]
-                          db))]
-    (if (nil? page) :login page)
-    )
-
-  (defn activate-view [new-view]
-    (let [e (app-entity-id @conn)]
-      (d/transact! conn [ {:db/id e
-                           :app/page new-view} ]))))
-
 (defn user
   ([db] (as-> (d/q '[:find  ?u
                      :where
@@ -95,6 +68,41 @@
                        db id)
                   ffirst
                   (d/entity db)))))
+
+(defn login-name [db]
+  (ffirst (d/q '[:find  ?name
+                 :where [_ :app/login-name ?name]]
+               db)))
+
+(defn login [name]
+  (let [e (ffirst (d/q '[:find  ?e
+                         :in $ ?name
+                         :where [?e :user/name ?name]]
+                       @conn name))
+        a (app-entity-id @conn)]
+    (if (not (nil? e))
+      (as-> (d/transact! conn [ {:db/id a
+                                 :app/user e} ])
+            x
+            (user (:db-after x))))))
+
+(defn active-view [db]
+  (let [page (ffirst (d/q '[:find ?page
+                             :where [_ :app/page ?page]]
+                          db))]
+    (if (nil? page) :login page)
+    ))
+
+(defn update [e a v]
+  (d/transact! conn [ {:db/id e
+                       a v} ]))
+
+(defn activate-view [new-view]
+    (let [e (app-entity-id @conn)]
+      (d/transact! conn [ {:db/id e
+                           :app/page new-view} ])))
+
+
 
 (defn rankings [db]
   (as-> (d/q '[:find  ?r ?p ?un
@@ -122,7 +130,7 @@
   ""
   []
   (d/transact! conn
-               [{:db/id -1
+               [{:db/id 1
                  :app/page :login}
 
                 {:db/id -2

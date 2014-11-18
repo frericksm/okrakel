@@ -24,8 +24,7 @@
              :srcmap {:cljsbuild
                       {:builds
                        {:client {:compiler
-                                 {:source-map "target/client.js.map"
-                                  :source-map-path "client"}}}}}}
+                                 {:source-map "target/client.js.map"}}}}}}
   :source-paths ["src"]
   :cljsbuild
   {:builds
@@ -33,6 +32,5 @@
              :compiler
              {:preamble ["reagent/react.js"]
               :output-dir "target/client"
-              :output-to "target/client.js"
-              :pretty-print true}}}}
+              :output-to "target/client.js"}}}}
   )
