@@ -24,7 +24,7 @@
              (a/activate-view next-view))
 
 ;; when game is started
-(go-loop-sub event-bus-pub :reset-game [_]
+(go-loop-sub event-bus-pub :start [_]
              (a/game-init))
 
 ;; when user logs in
@@ -33,7 +33,7 @@
 
 ;; Start the app
 (defn run []
-  (async/put! event-bus [:reset-game])
+  (async/put! event-bus [:start])
 
   (om/root comp/title a/conn
            {:target (.getElementById js/document "title")

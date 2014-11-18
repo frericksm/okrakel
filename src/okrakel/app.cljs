@@ -66,14 +66,16 @@
                            :app/user e} ]))))
 
 (defn active-view [db]
-  (ffirst (d/q '[:find ?id
-                 :where [_ :app/page ?id]]
-               db)))
+  (let [page (ffirst (d/q '[:find ?page
+                             :where [_ :app/page ?page]]
+                          db))]
+    (if (nil? page) :login page)
+    )
 
-(defn activate-view [new-view]
-  (let [e (app-entity-id @conn)]
-    (d/transact! conn [ {:db/id e
-                         :app/page new-view} ])))
+  (defn activate-view [new-view]
+    (let [e (app-entity-id @conn)]
+      (d/transact! conn [ {:db/id e
+                           :app/page new-view} ]))))
 
 (defn user
   ([db] (as-> (d/q '[:find  ?u
