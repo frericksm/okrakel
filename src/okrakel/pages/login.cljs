@@ -49,7 +49,10 @@
         (html
          [:div {:class "card"}
           [:form
-           [:input {:type "text" :placeholder "Name" :value name
+           [:input {:type "text"
+                    :placeholder "Name"
+                    :value name
+                    :auto-focus true
                     :on-key-down (text-keydown #(login event-bus %))
                     :on-change (text-change #(update-login-name event-bus %))}]
            [:button {:class "btn btn-positive btn-block"
