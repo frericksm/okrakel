@@ -24,7 +24,9 @@
              :srcmap {:cljsbuild
                       {:builds
                        {:client {:compiler
-                                 {:source-map "target/client.js.map"}}}}}}
+                                 {
+                                  :source-map "target/client.js.map"
+                                  }}}}}}
   :source-paths ["src"]
   :cljsbuild
   {:builds
