@@ -40,26 +40,26 @@
       (let [loggedIn (not= :login (a/active-view db))
             event-bus (om/get-shared owner :event-bus)
             tabs [{:page :home
-                     :icon "icon-home"
-                     :label "Home"}
-                    {:page :ranking
-                     :icon "icon-more-vertical"
-                     :label "Ranking"}
-                    {:page :table
-                     :icon "icon-list"
-                     :label "Tabelle"}]])
-      (if loggedIn
-        (html
-         [:nav {:class "bar bar-tab"}
-          (for [tab tabs]
-            (let [active (= (:page tab) (a/active-view db))
-                  a-classes (if active "tab-item active" "tab-item")
-                  icon-classes (clojure.string/join " " ["icon" (:icon tab)])]
-              [:a {:class a-classes
-                   :on-click (fn [e] (async/put! event-bus
-                                                [:select-view (:page tab)]))}
-               [:span {:class icon-classes}]
-               [:span {:class "tab-label"} (:label tab)]]))
-          ])
-        (html
-         [:nav {:class "bar bar-tab"}])))))
+                   :icon "icon-home"
+                   :label "Home"}
+                  {:page :ranking
+                   :icon "icon-more-vertical"
+                   :label "Ranking"}
+                  {:page :table
+                   :icon "icon-list"
+                   :label "Tabelle"}]]
+        (if loggedIn
+          (html
+           [:nav {:class "bar bar-tab"}
+            (for [tab tabs]
+              (let [active (= (:page tab) (a/active-view db))
+                    a-classes (if active "tab-item active" "tab-item")
+                    icon-classes (clojure.string/join " " ["icon" (:icon tab)])]
+                [:a {:class a-classes
+                     :on-click (fn [e] (async/put! event-bus
+                                                  [:select-view (:page tab)]))}
+                 [:span {:class icon-classes}]
+                 [:span {:class "tab-label"} (:label tab)]]))
+            ])
+          (html
+           [:nav {:class "bar bar-tab"}]))))))

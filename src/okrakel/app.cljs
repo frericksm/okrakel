@@ -93,7 +93,7 @@
     (if (nil? page) :login page)
     ))
 
-(defn update [e a v]
+(defn update-entity[e a v]
   (d/transact! conn [ {:db/id e
                        a v} ]))
 

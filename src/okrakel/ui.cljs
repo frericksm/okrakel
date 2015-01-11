@@ -29,7 +29,7 @@
 
 ;; when game is started
 (go-loop-sub event-bus-pub :update [_ e a v]
-             (a/update e a v))
+             (a/update-entity e a v))
 
 ;; when user logs in
 (go-loop-sub event-bus-pub :login [_ name]
@@ -53,4 +53,3 @@
             :shared {:event-bus event-bus}}))
 
 (run)
-

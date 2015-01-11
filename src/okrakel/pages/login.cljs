@@ -50,13 +50,21 @@
          [:div {:class "card"}
           [:form
            [:input {:type "text"
-                    :placeholder "Name"
+                    :placeholder "Email oder Username"
                     :value name
                     :auto-focus true
+                    ;:on-change (text-change #(update-login-name event-bus %))
+                    }]
+           [:input {:type "password"
+                    :placeholder "Passwort"
                     :on-key-down (text-keydown #(login event-bus %))
-                    :on-change (text-change #(update-login-name event-bus %))}]
+                    }]
            [:button {:class "btn btn-positive btn-block"
                      :on-click (button-clicked (partial login event-bus name))}
             "Login"] 
-           ]])))
+           ]
+          ])))
     ))
+
+
+
