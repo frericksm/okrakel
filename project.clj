@@ -3,12 +3,12 @@
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.6.0"]
+  :dependencies [[org.clojure/clojure "1.7.0"]
 
                  ;; UI
-                 [org.clojure/clojurescript "0.0-2511"]
+                 [org.clojure/clojurescript "1.7.28"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-
+   
                  ;; UI om
                  [org.om/om "0.8.0"]
                  [sablono "0.2.22"]
