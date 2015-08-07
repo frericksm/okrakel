@@ -6,39 +6,35 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
 
                  ;; UI
-                 [org.clojure/clojurescript "1.7.28"]
+                 [org.clojure/clojurescript "1.7.48"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
    
                  ;; UI om
                  [org.om/om "0.8.0"]
                  [sablono "0.2.22"]
                  [cljs-ajax "0.2.6"]
-                 [datascript "0.5.1"]
 
                  ;; UI regent
-                 [reagent "0.4.2"]]
+                 [reagent "0.4.2"]
+
+                 ;; UI rum
+                 [rum "0.2.6"]
+
+                 ;; DB
+                 [datascript "0.11.6"]
+
+]
   
-  :plugins [[lein-cljsbuild "1.0.3"]]
-  :hooks [leiningen.cljsbuild]
-  :profiles {:prod {:cljsbuild
-                    {:builds
-                     {:client {:compiler
-                               {:optimizations :advanced
-                                :preamble ^:replace ["reagent/react.min.js"]
-                                :pretty-print false}}}}}
-             :srcmap {:cljsbuild
-                      {:builds
-                       {:client {:compiler
-                                 {
-                                  :source-map "target/client.js.map"
-                                  }}}}}}
-  :source-paths ["src"]
-  
+  :plugins [[lein-cljsbuild "1.0.6"]]
+
   :cljsbuild {:builds [{:id "dev"
                         :source-paths ["src"]
                         :compiler {
+                                   :main  okrakel.app2
                                    :output-to "target/client.js"
                                    :output-dir "target/client"
                                    :optimizations :none
-                                   :source-map true}}]}
+                                   :source-map true
+                                   ;;:source-map "client.js.map"
+                                   :warnings      {:single-segment-namespace false}}}]}
   )
