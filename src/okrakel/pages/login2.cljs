@@ -17,7 +17,7 @@
   (fn [e]
     (do
       (callback)
-      (.preventDefault e))))
+     (.preventDefault e))))
 
 (defn- text-change [callback]
   (fn [e]
@@ -41,7 +41,7 @@
         name (od/login-name db)]
     [:div {:class "card"}
      [:form
-          [:input#user_name {:type "text"
+          [:input.username {:type "text"
                    :placeholder "Email oder Username"
                    :value name
                    :auto-focus true
@@ -54,8 +54,7 @@
       [:button {:class "btn btn-positive btn-block"
                 :on-click (button-clicked 
                            (partial login event-bus  
-                                    ;;(dom/value (dom/q "#user_name"))
-                                    "Hummi"
+                                    (dom/value (dom/q ".username"))
                                     ))
                 }
        "Login"] 

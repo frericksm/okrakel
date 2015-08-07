@@ -8,9 +8,10 @@
   (set! (.-value el) value))
 
 (defn value [el]
-  (let [val (.-value el)]
-    (when-not (str/blank? val)
-      (str/trim val))))
+  (if el
+    (let [val (.-value el)]
+      (when-not (str/blank? val)
+        (str/trim val)))))
 
 (defn date-value [el]
   (when-let [val (value el)]
