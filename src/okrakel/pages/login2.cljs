@@ -3,7 +3,8 @@
                    [cljs.core.async.macros :refer [go go-loop]])
   (:require [rum :include-macros true]
             [cljs.core.async :as async]
-            [okrakel.data :as a]))
+            [okrakel.data :as od]
+            [okrakel.dom :as dom]))
 
 ;; COMMUNICATION
 (defn- login [chan name]
@@ -35,22 +36,28 @@
 
 ;; UI
 
-(rum/defc view [db event-bus]
-  (let [name (a/login-name db)]
+(rum/defc view [conn event-bus]
+  (let [db   @conn
+        name (od/login-name db)]
     [:div {:class "card"}
      [:form
-          [:input {:type "text"
+          [:input#user_name {:type "text"
                    :placeholder "Email oder Username"
                    :value name
                    :auto-focus true
                    ;;:on-change (text-change #(update-login-name event-bus %))
                    }]
-      [:input {:type "password"
+      [:input#password {:type "password"
                :placeholder "Passwort"
                :on-key-down (text-keydown #(login event-bus %))
                }]
       [:button {:class "btn btn-positive btn-block"
-                :on-click (button-clicked (partial login event-bus name))}
+                :on-click (button-clicked 
+                           (partial login event-bus  
+                                    ;;(dom/value (dom/q "#user_name"))
+                                    "Hummi"
+                                    ))
+                }
        "Login"] 
       ]
      ]))

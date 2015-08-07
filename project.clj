@@ -18,7 +18,7 @@
                  [reagent "0.4.2"]
 
                  ;; UI rum
-                 [rum "0.2.6"]
+                 [rum "0.2.7"]
 
                  ;; DB
                  [datascript "0.11.6"]

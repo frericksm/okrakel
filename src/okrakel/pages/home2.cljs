@@ -1,12 +1,13 @@
 (ns okrakel.pages.home2
   (:require [cljs.core.async :as async]
             [rum :include-macros true]
-            [okrakel.data :as a]))
+            [okrakel.data :as od]))
 
-(rum/defc view [db event-bus]
-  (let [user (a/user db)
+(rum/defc view < rum/reactive [conn event-bus]
+  (let [db   (rum/react conn)
+        user (od/user db)
         uname (:user/name user)
-        [ranking points] (a/ranking db (get user :user/id))
+        [ranking points] (od/ranking db (get user :user/id))
         ]
     [:div {:class "card"}
      [:div {:class "table-view"}
@@ -28,7 +29,9 @@
       [:div {:class "table-view-divider"} "Meine Gruppen"]
       [:div {:class "table-view-cell"}
        [:a {:class "navigate-right"
-            :on-click (fn [e] (async/put! event-bus [:select-view :matchdays]))}
+            :on-click (fn [e] (do 
+                                (async/put! event-bus [:select-view :matchdays])
+                                (.preventDefault e)))}
         "Hinter Thailand"]]
       [:div {:class "table-view-divider"} "Spieltage"]
       [:div {:class "table-view-cell"}

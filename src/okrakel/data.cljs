@@ -31,16 +31,17 @@
                  :where [_ :app/login-name ?name]]
                db)))
 
-(defn login [db name]
-  (let [e (ffirst (d/q '[:find  ?e
+(defn login [conn name]
+  (let [db @conn
+        e (ffirst (d/q '[:find  ?e
                          :in $ ?name
                          :where [?e :user/name ?name]]
                        db name))
         a (app-entity-id db)]
     (if (not (nil? e))
-      (as-> (d/transact! db [ {:db/id a
-                               :app/user e} ])
-            x
+      (as-> (d/transact! conn [{:db/id a
+                                :app/user e} ])
+          x
         (user (:db-after x))))))
 
 (defn active-view [db]
@@ -53,7 +54,8 @@
   (d/transact! conn {:db/id e a v} ))
 
 (defn activate-view [conn new-view]
-  (let [e (app-entity-id conn)]
+  (let [db @conn
+        e (app-entity-id db)]
       (d/transact! conn [ {:db/id e
                            :app/page new-view} ])))
 
