@@ -1,22 +1,13 @@
 (ns okrakel.contentui
-  (:require-macros [okrakel.ui :refer [go-loop-sub]]
-                   [cljs.core.async.macros :refer [go go-loop]])
-  (:require [cljs.core.async :as async]
-            [om.core :as om  :include-macros true]
-            [om.dom :as dom :include-macros true]
-            ;[ajax.core :refer (GET)]
-            [sablono.core :as html :refer-macros [html]]
-            [okrakel.app :as a]
-            [goog.events :as events]
-
+  (:require [okrakel.data :as od]
             [okrakel.pages.login]
             [okrakel.pages.ranking]
             [okrakel.pages.matchdays]
             [okrakel.pages.groups]
             [okrakel.pages.settings]
             [okrakel.pages.table]
-            
             [okrakel.pages.home]
+            [rum :include-macros true]
             )
   (:import [goog.events EventType]))
 
@@ -29,16 +20,15 @@
             :table     {:title "Bundesliga-Tabelle"}
             })
 
-(defn select-view [db owner]
-  (let [p (a/active-view db)]
+(rum/defc select-view < rum/reactive [conn event-bus]
+  (let [db (rum/react conn)
+        p  (od/active-view db)]
     (cond
-     (= p :login)     (okrakel.pages.login/view db owner)
-     (= p :ranking)   (okrakel.pages.ranking/view db owner)
-     (= p :matchdays) (okrakel.pages.matchdays/view db owner)
-     (= p :groups)    (okrakel.pages.groups/view db owner)
-     (= p :settings)  (okrakel.pages.settings/view db owner)
-     (= p :table)     (okrakel.pages.table/view db owner)
-     (= p :home)      (okrakel.pages.home/view db owner)
-     :else            (okrakel.pages.login/view db owner)   
-     ))
-  )
+      (= p :login)     (okrakel.pages.login/view conn event-bus)
+      (= p :ranking)   (okrakel.pages.ranking/view conn event-bus)
+      (= p :matchdays) (okrakel.pages.matchdays/view conn event-bus)
+      (= p :groups)    (okrakel.pages.groups/view conn event-bus)
+      (= p :settings)  (okrakel.pages.settings/view conn event-bus)
+      (= p :table)     (okrakel.pages.table/view conn event-bus)
+      (= p :home)      (okrakel.pages.home/view conn event-bus)
+      :else            (okrakel.pages.login/view conn event-bus))))

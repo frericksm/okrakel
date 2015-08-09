@@ -1,14 +1,10 @@
 (ns okrakel.pages.login
   (:require-macros [okrakel.ui :refer [go-loop-sub]]
                    [cljs.core.async.macros :refer [go go-loop]])
-  (:require [cljs.core.async :as async]
-            [om.core :as om  :include-macros true]
-            [om.dom :as dom :include-macros true]
-            ;[ajax.core :refer (GET)]
-            [sablono.core :as html :refer-macros [html]]
-            [okrakel.app :as a]
-            [goog.events :as events])
-  (:import [goog.events EventType]))
+  (:require [rum :include-macros true]
+            [cljs.core.async :as async]
+            [okrakel.data :as od]
+            [okrakel.dom :as dom]))
 
 ;; COMMUNICATION
 (defn- login [chan name]
@@ -21,7 +17,7 @@
   (fn [e]
     (do
       (callback)
-      (.preventDefault e))))
+     (.preventDefault e))))
 
 (defn- text-change [callback]
   (fn [e]
@@ -40,31 +36,27 @@
 
 ;; UI
 
-(defn view [db owner]
-  (reify
-    om/IRender
-    (render [_]
-      (let [event-bus (om/get-shared owner :event-bus)
-            name (a/login-name db)]
-        (html
-         [:div {:class "card"}
-          [:form
-           [:input {:type "text"
-                    :placeholder "Email oder Username"
-                    :value name
-                    :auto-focus true
-                    ;:on-change (text-change #(update-login-name event-bus %))
-                    }]
-           [:input {:type "password"
-                    :placeholder "Passwort"
-                    :on-key-down (text-keydown #(login event-bus %))
-                    }]
-           [:button {:class "btn btn-positive btn-block"
-                     :on-click (button-clicked (partial login event-bus name))}
-            "Login"] 
-           ]
-          ])))
-    ))
-
-
-
+(rum/defc view [conn event-bus]
+  (let [db   @conn
+        name (od/login-name db)]
+    [:div {:class "card"}
+     [:form
+          [:input.username {:type "text"
+                   :placeholder "Email oder Username"
+                   :value name
+                   :auto-focus true
+                   ;;:on-change (text-change #(update-login-name event-bus %))
+                   }]
+      [:input#password {:type "password"
+               :placeholder "Passwort"
+               ;;:on-key-down (text-keydown #(login event-bus %))
+               }]
+      [:button {:class "btn btn-positive btn-block"
+                :on-click (button-clicked 
+                           (fn [] (login event-bus  
+                                        (dom/value (dom/q ".username"))
+                                        )))
+                }
+       "Login"] 
+      ]
+     ]))

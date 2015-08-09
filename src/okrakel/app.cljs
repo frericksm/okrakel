@@ -2,18 +2,14 @@
   (:require-macros [okrakel.ui :refer [go-loop-sub]]
                    [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :as async]
-            [om.core :as om  :include-macros true]
-            [om.dom :as dom :include-macros true]
-            ;[ajax.core :refer (GET)]
-            [sablono.core :as html :refer-macros [html]]
-            [goog.events :as events]
-            [datascript :as d]
-            [datascript.core :as dc])
-  (:import [goog.events EventType]))
+            [okrakel.ui :as ui]
+            [okrakel.data :as od]
+            [datascript :as d]))
 
 (enable-console-print!)
 
-(def schema
+;; DB
+(def schema 
   {:app/page  {}
    :app/group {}
    :app/user  {:db/valueType :db.type/ref}
@@ -38,138 +34,31 @@
 
 (def conn (d/create-conn schema))
 
-;; prevent cursor-ification
-(extend-type dc/DB
-  om/IToCursor
-  (-to-cursor
-    ([this _] this)
-    ([this _ _] this)))
+;; EVENT BUS
 
-(defn- app-entity-id [db]
-  (ffirst (d/q '[:find  ?e
-                 :where [?e :app/page]]
-               db)))
-
-(defn user
-  ([db] (as-> (d/q '[:find  ?u
-                     :where
-                     [_ :app/user ?u]]
-                   db)
-              x
-              (ffirst x)
-              (if (not (nil? x))
-                (d/entity db x))))
-  
-  ([db id] (if (not (nil? id))
-             (->> (d/q '[:find  ?e
-                         :in $ ?id 
-                         :where
-                         [?e :user/id ?id]]
-                       db id)
-                  ffirst
-                  (d/entity db)))))
-
-(defn login-name [db]
-  (ffirst (d/q '[:find  ?name
-                 :where [_ :app/login-name ?name]]
-               db)))
-
-(defn login [name]
-  (let [e (ffirst (d/q '[:find  ?e
-                         :in $ ?name
-                         :where [?e :user/name ?name]]
-                       @conn name))
-        a (app-entity-id @conn)]
-    (if (not (nil? e))
-      (as-> (d/transact! conn [ {:db/id a
-                                 :app/user e} ])
-            x
-            (user (:db-after x))))))
-
-(defn active-view [db]
-  (let [page (ffirst (d/q '[:find ?page
-                             :where [_ :app/page ?page]]
-                          db))]
-    (if (nil? page) :login page)
-    ))
-
-(defn update-entity[e a v]
-  (d/transact! conn [ {:db/id e
-                       a v} ]))
-
-(defn activate-view [new-view]
-    (let [e (app-entity-id @conn)]
-      (d/transact! conn [ {:db/id e
-                           :app/page new-view} ])))
+(def event-bus (async/chan))
+(def event-bus-pub (async/pub event-bus first))
 
 
+;; when a view is selected
+(go-loop-sub event-bus-pub :select-view [_ next-view]
+             (od/activate-view conn next-view))
 
-(defn rankings [db]
-  (as-> (d/q '[:find  ?r ?p ?un
-               :where
-               [?e :ranking/rank ?r]
-               [?e :ranking/points ?p]
-               [?e :ranking/users ?u]
-               [?u :user/name ?un]]
-             db) x
-             (sort-by first x)))
+;; when game is started
+(go-loop-sub event-bus-pub :start [_]
+             (od/game-init conn))
 
-(defn ranking [db user-id]
-  (if (not  (nil? user-id))
-    (as-> (d/q '[:find ?r ?p 
-                 :in $ ?uid
-                 :where
-                 [?e :ranking/rank ?r]
-                 [?e :ranking/points ?p]
-                 [?e :ranking/users ?u]
-                 [?u :user/id ?uid]]
-               db user-id) x
-               (first x))))
+;; when game is started
+(go-loop-sub event-bus-pub :update [_ e a v]
+             (od/update-entity conn e a v))
 
-(defn game-init
-  ""
-  []
-  (d/transact! conn
-               [{:db/id 1
-                 :app/page :login}
+;; when user logs in
+(go-loop-sub event-bus-pub :login [_ name]
+             (if (not (nil? (od/login conn name)))
+               (async/put! event-bus [:select-view :home])))
 
-                {:db/id -2
-                 :user/id 1
-                 :user/name "Hummi"}
-                {:db/id -3
-                 :user/id 2
-                 :user/name "Paul Krake"}
-                {:db/id -4
-                 :user/id 3
-                 :user/name "Chipie 1967"}
-                {:db/id -5
-                 :user/id 4
-                 :user/name "Max 2003"} 
-                
-                {:db/id -100
-                 :group/name "Hinter Thailand"
-                 :group/members [-2 -3 -4 -5]}
-                
-                {:db/id -200
-                 :spiel/spieltag 1
-                 :spiel/heim "Schalke 04"
-                 :spiel/gast "Bayern München"}
+;; ON PAGE LOAD
 
-                {:db/id -1000
-                 :ranking/rank 1
-                 :ranking/points 87
-                 :ranking/users [-2]}
-                {:db/id -1001
-                 :ranking/rank 2
-                 :ranking/points 79
-                 :ranking/users [-3]}
-                {:db/id -1002
-                 :ranking/rank 3
-                 :ranking/points 78
-                 :ranking/users [-4]}
-                {:db/id -1003
-                 :ranking/rank 4
-                 :ranking/points 72
-                 :ranking/users [-5]}]
-               ))
-
+(defn ^:export start []
+  (async/put! event-bus [:start])
+  (ui/mount conn event-bus))

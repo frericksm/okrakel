@@ -1,45 +1,30 @@
 (ns okrakel.components.core
-  (:require-macros [okrakel.ui :refer [go-loop-sub]]
-                   [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :as async]
-            [om.core :as om  :include-macros true]
-            [om.dom :as dom :include-macros true]
-            ;[ajax.core :refer (GET)]
-            [sablono.core :as html :refer-macros [html]]
-            [okrakel.app :as a]
+            [okrakel.data :as od]
             [okrakel.contentui :as cu]
-            [goog.events :as events]
-            [clojure.string])
-  (:import [goog.events EventType]))
+            [clojure.string]
+            [rum :include-macros true]))
 
-(enable-console-print!)
+(rum/defc title < rum/reactive [conn event-bus]
+  (let [db       (rum/react conn)
+        av       (od/active-view db)
+        loggedIn (not= :login av)]
+    (if loggedIn
+      [:span
+       [:a {:class "icon icon-gear pull-right"
+            :on-click (fn [e] (async/put! event-bus
+                                         [:select-view :settings]))}]  
+       [:h1 {:class "title" }
+        (get-in cu/pages [av :title])]]
+      [:span
+       [:h1 {:class "title" }
+        (get-in cu/pages [av :title])]])))
 
-(defn title [db owner]
-  (reify
-    om/IRender
-    (render [_]
-      (let [loggedIn (not= :login (a/active-view db))
-            event-bus (om/get-shared owner :event-bus)]
-        (if loggedIn
-          (html
-           [:span
-            [:a {:class "icon icon-gear pull-right"
-                 :on-click (fn [e] (async/put! event-bus
-                                              [:select-view :settings]))}]  
-            [:h1 {:class "title" }
-             (get-in cu/pages [(a/active-view db) :title])]])
-          (html
-           [:span
-            [:h1 {:class "title" }
-             (get-in cu/pages [(a/active-view db) :title])]]))))))
-
-(defn nav [db owner ]
-  (reify
-    om/IRender
-    (render [_]
-      (let [loggedIn (not= :login (a/active-view db))
-            event-bus (om/get-shared owner :event-bus)
-            tabs [{:page :home
+(rum/defc nav < rum/reactive [conn event-bus]
+  (let [db       (rum/react conn)
+        av       (od/active-view db)
+        loggedIn (not= :login av)
+        tabs     [{:page :home
                    :icon "icon-home"
                    :label "Home"}
                   {:page :ranking
@@ -48,18 +33,19 @@
                   {:page :table
                    :icon "icon-list"
                    :label "Tabelle"}]]
-        (if loggedIn
-          (html
-           [:nav {:class "bar bar-tab"}
-            (for [tab tabs]
-              (let [active (= (:page tab) (a/active-view db))
-                    a-classes (if active "tab-item active" "tab-item")
-                    icon-classes (clojure.string/join " " ["icon" (:icon tab)])]
-                [:a {:class a-classes
-                     :on-click (fn [e] (async/put! event-bus
-                                                  [:select-view (:page tab)]))}
-                 [:span {:class icon-classes}]
-                 [:span {:class "tab-label"} (:label tab)]]))
-            ])
-          (html
-           [:nav {:class "bar bar-tab"}]))))))
+    (if loggedIn
+      [:nav {:class "bar bar-tab"}
+       (for [tab tabs]
+         (let [active (= (:page tab) (od/active-view db))
+               a-classes (if active "tab-item active" "tab-item")
+               icon-classes (clojure.string/join " " ["icon" (:icon tab)])]
+           [:a {:class a-classes
+                :on-click (fn [e] (do  
+                                    (async/put! event-bus
+                                                [:select-view (:page tab)])
+                                    (.preventDefault e)))}
+            [:span {:class icon-classes}]
+            [:span {:class "tab-label"} (:label tab)]]))
+       ]
+      [:nav {:class "bar bar-tab"}])
+    ))
