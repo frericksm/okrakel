@@ -16,6 +16,9 @@
                  [datascript "0.11.6"]
 
                  [com.cognitect/transit-cljs "0.8.220"]
+
+                 ;; Components
+                 [quile/component-cljs "0.2.4"]
 ]
   
   :plugins [[lein-cljsbuild "1.0.6"]]
