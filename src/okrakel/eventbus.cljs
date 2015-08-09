@@ -1,4 +1,4 @@
-(ns okrakel.app
+(ns okrakel.eventbus
   (:require-macros [okrakel.ui :refer [go-loop-sub]]
                    [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :as async]
@@ -7,33 +7,6 @@
             [okrakel.persist :as p]
             [okrakel.system :as system]
             [datascript :as d]))
-
-(enable-console-print!)
-
-(defonce system nil)
-
-(defn init
-  "Constructs the current development system."
-  []
-  (alter-var-root #'system
-    (constantly (system/system))))
-
-(defn start
-  "Starts the current development system."
-  []
-  (alter-var-root #'system system/start))
-
-(defn stop
-  "Shuts down and destroys the current development system."
-  []
-  (alter-var-root #'system
-    (fn [s] (when s (system/stop s)))))
-
-(defn go
-  "Initializes the current development system and starts it running."
-  []
-  (init)
-  (start))
 
 
 ;; EVENT BUS
@@ -61,9 +34,6 @@
              (if (not (nil? (od/login conn name)))
                (async/put! event-bus [:select-view :home])))
 
-;; ON PAGE LOAD
 
-(defn ^:export start []
-  (go)
-  
-  (async/put! event-bus [:start]))
+
+

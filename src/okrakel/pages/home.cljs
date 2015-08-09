@@ -30,7 +30,7 @@
       [:div {:class "table-view-cell"}
        [:a {:class "navigate-right"
             :on-click (fn [e] (do 
-                                (async/put! event-bus [:select-view :matchdays])
+                                (async/put! event-bus [:select-view :groups])
                                 (.preventDefault e)))}
         "Hinter Thailand"]]
       [:div {:class "table-view-divider"} "Spieltage"]

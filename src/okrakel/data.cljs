@@ -1,6 +1,19 @@
 (ns okrakel.data
   (:require [datascript :as d]))
 
+(def fixtures 
+  [
+   {:db/id -2 :user/id 1 :user/name "Hummi"}
+   {:db/id -3 :user/id 2 :user/name "Paul Krake"}
+   {:db/id -4 :user/id 3 :user/name "Chipie 1967"}
+   {:db/id -5 :user/id 4 :user/name "Max 2003"} 
+   {:group/name "Hinter Thailand" :group/members [-2 -3 -4 -5]}
+   {:spiel/spieltag 1 :spiel/heim "Schalke 04 ":spiel/gast "Bayern München"}
+   {:ranking/rank 1 :ranking/points 87 :ranking/users [-2]}
+   {:ranking/rank 2 :ranking/points 79 :ranking/users [-3]}
+   {:ranking/rank 3 :ranking/points 78 :ranking/users [-4]}
+   {:ranking/rank 4 :ranking/points 73 :ranking/users [-5]}
+   ])
 
 (defn- app-entity-id [db]
   (ffirst (d/q '[:find  ?e
@@ -81,50 +94,7 @@
                db user-id) x
                (first x))))
 
-(defn game-init
+(defn init
   ""
   [conn]
-  (d/transact! conn
-               [{:db/id 1
-                 :app/page :login}
-
-                {:db/id -2
-                 :user/id 1
-                 :user/name "Hummi"}
-                {:db/id -3
-                 :user/id 2
-                 :user/name "Paul Krake"}
-                {:db/id -4
-                 :user/id 3
-                 :user/name "Chipie 1967"}
-                {:db/id -5
-                 :user/id 4
-                 :user/name "Max 2003"} 
-                
-                {:db/id -100
-                 :group/name "Hinter Thailand"
-                 :group/members [-2 -3 -4 -5]}
-                
-                {:db/id -200
-                 :spiel/spieltag 1
-                 :spiel/heim "Schalke 04"
-                 :spiel/gast "Bayern München"}
-
-                {:db/id -1000
-                 :ranking/rank 1
-                 :ranking/points 87
-                 :ranking/users [-2]}
-                {:db/id -1001
-                 :ranking/rank 2
-                 :ranking/points 79
-                 :ranking/users [-3]}
-                {:db/id -1002
-                 :ranking/rank 3
-                 :ranking/points 78
-                 :ranking/users [-4]}
-                {:db/id -1003
-                 :ranking/rank 4
-                 :ranking/points 72
-                 :ranking/users [-5]}]
-               ))
-
+  (d/transact! conn fixtures))

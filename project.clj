@@ -14,6 +14,8 @@
 
                  ;; DB
                  [datascript "0.11.6"]
+
+                 [com.cognitect/transit-cljs "0.8.220"]
 ]
   
   :plugins [[lein-cljsbuild "1.0.6"]]
