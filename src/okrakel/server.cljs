@@ -1,17 +1,16 @@
-(ns okrakelt.server
+(ns okrakel.server
   (:require
    [cljs.reader]
    [cljs.core.async :as async]
    [datascript :as d]
-   [okrakel.util :as u])
+   [okrakel.utils :as u])
   (:import
    [goog.net XhrIo])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]] ))
 
-(enable-console-print!)
 
-(def fixtures [
+#_(def fixtures [
   {:room/title "World domination"     :room/source "web/rooms/world_domination.edn"}
   {:room/title "Pussies"              :room/source "web/rooms/pussies.edn"}
   {:room/title "Internet of cats"     :room/source "web/rooms/cats.edn"}
@@ -47,7 +46,7 @@
 
 ;; UTILS
 
-(defn- ajax [url callback]
+#_(defn- ajax [url callback]
   (.send goog.net.XhrIo url
     (fn [reply]
       (-> (.-target reply)
@@ -55,27 +54,27 @@
           (cljs.reader/read-string)
           (callback)))))
 
-(defn- rand-n [min max]
+#_(defn- rand-n [min max]
   (+ min (rand-int (- max min))))
 
-(defn- rand-pred [pred f]
+#_(defn- rand-pred [pred f]
   (let [x (f)]
     (if (pred x) x (recur pred f))))
 
-(defn- later [f]
+#_(defn- later [f]
   (js/setTimeout f (rand-n 1000 2000)))
 
 ;; FIXTURES
 
-(def conn (d/create-conn {
+#_(def conn (d/create-conn {
   :room/messages {:db/cardinality :db.cardinality/many}
 }))
 
 ;; pre-populate rooms list and user names
-(d/transact! conn fixtures)
+#_(d/transact! conn fixtures)
 
 ;; load all room messages variants
-(doseq [[id url title] (u/-q '[:find ?id ?src ?title
+#_(doseq [[id url title] (u/-q '[:find ?id ?src ?title
                                :where [?id :room/source ?src]
                                       [?id :room/title ?title]] @conn)]
   (ajax url
@@ -86,35 +85,35 @@
 
 ;; GENERATORS
 
-(defn- rand-user-id [db]
+#_(defn- rand-user-id [db]
   (d/q '[:find  (rand ?id) .
          :where [?id :user/name]]
        db))
 
-(defn- rand-room [db]
+#_(defn- rand-room [db]
   (d/q '[:find  (rand ?id) .
          :where [?id :room/title]]
        db))
 
-(defn- rand-message [db room-id]
+#_(defn- rand-message [db room-id]
   (-> (d/datoms db :aevt :room/messages room-id) (rand-nth) :v))
 
 ;; HELPERS
 
-(defn- user-by-id [db id]
+#_(defn- user-by-id [db id]
   (-> (d/entity db id)
       (select-keys [:db/id :user/name :user/avatar])))
 
 ;; "REST" API
 
-(def ^:private me (atom nil))
+#_(def ^:private me (atom nil))
 
-(defn call
+#_(defn call
   "Used to emulate async server calls"
   [f args callback]
   (later #(callback (apply f args))))
 
-(defn get-rooms
+#_(defn get-rooms
   "Return list of rooms"
   []
   (->> @conn
@@ -122,12 +121,12 @@
             :where [?id :room/title ?title]])
     (mapv #(zipmap [:db/id :room/title] %))))
 
-(defn get-user
+#_(defn get-user
   "Return specific user entity"
   [id]
   (user-by-id @conn id))
 
-(defn whoami
+#_(defn whoami
   "Return current user entity"
   []
   (let [db @conn
@@ -137,10 +136,10 @@
 
 ;; MESSAGING
 
-(def ^:private next-msg-id (atom 10000))
-(def ^:private msgs-chan (async/chan))
+#_(def ^:private next-msg-id (atom 10000))
+#_(def ^:private msgs-chan (async/chan))
 
-(defn send
+#_(defn send
   "Send message to server"
   [msg]
   (async/put! msgs-chan
@@ -148,7 +147,7 @@
       :db/id (swap! next-msg-id inc)
       :message/timestamp (js/Date.))))
 
-(go-loop []
+#_(go-loop []
   (<! (async/timeout (rand-n 500 1500)))
   (let [db @conn
         room-id   (rand-room db)
@@ -164,7 +163,7 @@
       (>! msgs-chan msg)))
   (recur))
 
-(defn subscribe
+#_(defn subscribe
   "Subscribe for server messages push"
   [on-msg]
   (go-loop []

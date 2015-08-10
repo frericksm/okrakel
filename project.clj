@@ -32,5 +32,6 @@
                                    :optimizations :none
                                    :source-map true
                                    ;;:source-map "client.js.map"
-                                   :warnings      {:single-segment-namespace false}}}]}
+                                   ;;:warnings      {:single-segment-namespace false}
+                                   }}]}
   )

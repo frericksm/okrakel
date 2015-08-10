@@ -1,61 +1,39 @@
 (ns okrakel.eventbus
-  (:require-macros [okrakel.ui :refer [go-loop-sub]]
-                   [cljs.core.async.macros :refer [go go-loop]])
-  (:require [cljs.core.async :as async]
-            [okrakel.ui :as ui]
-            [okrakel.data :as od]
-            [okrakel.persist :as p]
-            [okrakel.system :as system]
-            [datascript :as d]))
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
+  (:require [quile.component :as components]
+            [cljs.core.async :as async]))
 
-(defrecord EventBus [])
+;; PUBLIC API
+(defmacro go-loop-sub [pub key binding & body]
+ `(let [ch# (cljs.core.async/chan)]
+    (cljs.core.async/sub ~pub ~key ch#)
+    (go-loop []
+      (let [~binding (cljs.core.async/<! ch#)]
+        ~@body)
+      (recur))))
 
-(defn event-bus [event-bus event-bus-pub]
+;; COMPONENT DEFINITION
+(defrecord EventBus []
+  components/Lifecycle
+  (start [component]
+    (let [in-channel (async/chan)
+          publisher-channel (async/pub in-channel first)]
+      ;;Assemble component
+      (as-> component x
+        (assoc x :in-channel in-channel)
+        (assoc x :publisher-channel publisher-channel))))
+
+  (stop [component]
+    (let [input-channel (:input-channel component)
+          publisher-channel (:publisher-channel component)]
+      (async/close! publisher-channel)
+      (async/close! input-channel)
+          
+      ;;Disassemble component
+      (as-> component x
+        (dissoc x :input-channel)
+        (dissoc x :publisher-channel)))))
+
+;; CONSTRUCTOR
+(defn new-event-bus []
   (map->EventBus {}))
-
-
-(defn listen-to [eventbus key callback]
-  (let [ebp (:event-bus-pub eventbus)]
-    (go-loop-sub ebp key msg
-                 (callback msg))))
-
-(defn start [system]
-  (let [event-bus (async/chan)
-        event-bus-pub (async/pub event-bus first)]
-
-    ;; when a view is selected
-    (go-loop-sub event-bus-pub :select-view [_ next-view]
-                 (od/activate-view conn next-view))
-
-    ;; when game is started
-    (go-loop-sub event-bus-pub :start [_]
-                 (od/init conn)
-                 (p/init conn)
-                 (ui/mount conn event-bus))
-
-    ;; when game is started
-    (go-loop-sub event-bus-pub :update [_ e a v]
-                 (od/update-entity conn e a v))
-
-    ;; when user logs in
-    (go-loop-sub event-bus-pub :login [_ name]
-                 (if (not (nil? (od/login conn name)))
-                   (async/put! event-bus [:select-view :home])))
-
-    ;; Start
-    (async/put! event-bus [:start])
-
-    ;;Assemble system
-    (as-> system x
-      (assoc x :event-bus event-bus)
-      (assoc x :event-bus-pub event-bus-pub))))
-
-(defn stop [system]
-  (let [event-bus (:event-bus system
-        event-bus-pub (:event-bus-pub system)]
-        (async/close! event-bus)
-        (async/close! event-bus)
-    ;;Assemble system
-    (as-> system x
-      (dissoc x :event-bus)
-      (dissoc x :event-bus-pub)))))

@@ -1,5 +1,9 @@
 (ns okrakel.data
-  (:require [datascript :as d]))
+  (:require-macros [okrakel.eventbus :refer [go-loop-sub]])
+  (:require [datascript :as d]
+            [quile.component :as component]
+            [okrakel.eventbus :as e]
+            [okrakel.database]))
 
 (def fixtures 
   [
@@ -8,7 +12,7 @@
    {:db/id -4 :user/id 3 :user/name "Chipie 1967"}
    {:db/id -5 :user/id 4 :user/name "Max 2003"} 
    {:group/name "Hinter Thailand" :group/members [-2 -3 -4 -5]}
-   {:spiel/spieltag 1 :spiel/heim "Schalke 04 ":spiel/gast "Bayern MÃ¼nchen"}
+   {:spiel/spieltag 1 :spiel/heim "Schalke 04 ":spiel/gast "Bayern München"}
    {:ranking/rank 1 :ranking/points 87 :ranking/users [-2]}
    {:ranking/rank 2 :ranking/points 79 :ranking/users [-3]}
    {:ranking/rank 3 :ranking/points 78 :ranking/users [-4]}
@@ -94,7 +98,27 @@
                db user-id) x
                (first x))))
 
-(defn init
-  ""
-  [conn]
-  (d/transact! conn fixtures))
+
+;; COMPONENT DEFINITION
+(defrecord DataAccess [database event-bus]
+  component/Lifecycle
+  
+  (start [component]
+    (let [pub-ch (:publisher-channel event-bus)
+          conn (okrakel.database/conn database)]
+
+      (d/transact! (okrakel.database/conn database) fixtures)
+
+      ;; when update occurs
+      (go-loop-sub pub-ch
+                   :update [_ e a v]
+                   (update-entity conn e a v))
+      component))
+
+  (stop [component]
+    component))
+
+
+;; CONSTRUCTOR
+(defn new-data-access []
+  (map->DataAccess {}))

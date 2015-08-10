@@ -1,7 +1,5 @@
 (ns okrakel.pages.groups
-  (:require [rum :include-macros true]
-            [cljs.core.async :as async]
-            [okrakel.data :as a]))
+  (:require [rum :include-macros true]))
 
 (rum/defc view [db event-bus]
   [:div "Gruppen"])

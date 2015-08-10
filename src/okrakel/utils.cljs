@@ -1,4 +1,4 @@
-(ns okrakel.util
+(ns okrakel.utils
   (:require
     [datascript :as d]))
 

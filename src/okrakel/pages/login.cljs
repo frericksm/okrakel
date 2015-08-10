@@ -1,6 +1,4 @@
 (ns okrakel.pages.login
-  (:require-macros [okrakel.ui :refer [go-loop-sub]]
-                   [cljs.core.async.macros :refer [go go-loop]])
   (:require [rum :include-macros true]
             [cljs.core.async :as async]
             [okrakel.data :as od]
