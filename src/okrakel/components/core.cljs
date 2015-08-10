@@ -11,9 +11,11 @@
         loggedIn (not= :login av)]
     (if loggedIn
       [:span
-       [:a {:class "icon icon-gear pull-right"
+       [:a {:key "1"
+            :class "icon icon-gear pull-right"
             :on-click (fn [e] (async/put! in-ch [:select-view :settings]))}]  
-       [:h1 {:class "title" }
+       [:h1 {:key "2"
+             :class "title" }
         (get-in cu/pages [av :title])]]
       [:span
        [:h1 {:class "title" }
@@ -43,8 +45,10 @@
                 :on-click (fn [e] (do  
                                     (async/put! in-ch [:select-view (:page tab)])
                                     (.preventDefault e)))}
-            [:span {:class icon-classes}]
-            [:span {:class "tab-label"} (:label tab)]]))
+            [:span {:key 1
+                    :class icon-classes}]
+            [:span {:key 2
+                    :class "tab-label"} (:label tab)]]))
        ]
       [:nav {:class "bar bar-tab"}])
     ))
