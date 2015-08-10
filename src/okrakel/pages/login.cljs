@@ -33,26 +33,28 @@
         (.preventDefault e)))))
 
 ;; UI
-
-(rum/defc view [conn event-bus]
-  (let [db   @conn
-        name (od/login-name db)]
+(rum/defc view [conn in-ch]
+  (let [db    @conn
+        name  (od/login-name db)]
     [:div {:class "card"}
      [:form
-          [:input.username {:type "text"
-                   :placeholder "Email oder Username"
-                   :value name
-                   :auto-focus true
-                   ;;:on-change (text-change #(update-login-name event-bus %))
-                   }]
+      [:input#username {:type "text"
+                        :placeholder "Email oder Username"
+                        :value name
+                        :key "username"
+                        :auto-focus true
+                        ;;:on-change (text-change #(update-login-name event-bus %))
+                        }]
       [:input#password {:type "password"
-               :placeholder "Passwort"
-               ;;:on-key-down (text-keydown #(login event-bus %))
-               }]
+                        :placeholder "Passwort"
+                        :key "password"
+                        ;;:on-key-down (text-keydown #(login event-bus %))
+                        }]
       [:button {:class "btn btn-positive btn-block"
+                :key "login-btn"
                 :on-click (button-clicked 
-                           (fn [] (login event-bus  
-                                        (dom/value (dom/q ".username"))
+                           (fn [] (login in-ch  
+                                        (dom/value (dom/q "#username"))
                                         )))
                 }
        "Login"] 

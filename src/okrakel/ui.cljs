@@ -30,7 +30,7 @@
       (go-loop-sub pub-ch
                    :login [_ name]
                    (if (not (nil? (od/login conn name)))
-                     (async/put! event-bus [:select-view :home])))
+                     (async/put! in-ch [:select-view :home])))
       
       ;; RENDER MACHINERY
       ;; Mount ui

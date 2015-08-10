@@ -20,15 +20,15 @@
             :table     {:title "Bundesliga-Tabelle"}
             })
 
-(rum/defc select-view < rum/reactive [conn event-bus]
+(rum/defc select-view < rum/reactive [conn in-ch]
   (let [db (rum/react conn)
         p  (od/active-view db)]
     (cond
-      (= p :login)     (okrakel.pages.login/view conn event-bus)
-      (= p :ranking)   (okrakel.pages.ranking/view conn event-bus)
-      (= p :matchdays) (okrakel.pages.matchdays/view conn event-bus)
-      (= p :groups)    (okrakel.pages.groups/view conn event-bus)
-      (= p :settings)  (okrakel.pages.settings/view conn event-bus)
-      (= p :table)     (okrakel.pages.table/view conn event-bus)
-      (= p :home)      (okrakel.pages.home/view conn event-bus)
-      :else            (okrakel.pages.login/view conn event-bus))))
+      (= p :login)     (okrakel.pages.login/view conn in-ch)
+      (= p :ranking)   (okrakel.pages.ranking/view conn in-ch)
+      (= p :matchdays) (okrakel.pages.matchdays/view conn in-ch)
+      (= p :groups)    (okrakel.pages.groups/view conn in-ch)
+      (= p :settings)  (okrakel.pages.settings/view conn in-ch)
+      (= p :table)     (okrakel.pages.table/view conn in-ch)
+      (= p :home)      (okrakel.pages.home/view conn in-ch)
+      :else            (okrakel.pages.login/view conn in-ch))))

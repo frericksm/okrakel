@@ -3,7 +3,7 @@
             [rum :include-macros true]
             [okrakel.data :as od]))
 
-(rum/defc view < rum/reactive [conn event-bus]
+(rum/defc view < rum/reactive [conn in-ch]
   (let [db   (rum/react conn)
         user (od/user db)
         uname (:user/name user)
@@ -30,24 +30,24 @@
       [:div {:class "table-view-cell"}
        [:a {:class "navigate-right"
             :on-click (fn [e] (do 
-                                (async/put! event-bus [:select-view :groups])
+                                (async/put! in-ch [:select-view :groups])
                                 (.preventDefault e)))}
         "Hinter Thailand"]]
       [:div {:class "table-view-divider"} "Spieltage"]
       [:div {:class "table-view-cell"}
        [:a {:class "navigate-right"
-            :on-click (fn [e] (async/put! event-bus [:select-view :matchdays]))}
+            :on-click (fn [e] (async/put! in-ch [:select-view :matchdays]))}
         "Nächster Spieltag"]]
 
       [:div {:class "table-view-cell"}
        [:a {:class "navigate-right"
-            :on-click (fn [e] (async/put! event-bus [:select-view :matchdays]))}
+            :on-click (fn [e] (async/put! in-ch [:select-view :matchdays]))}
         "Übersicht"]]
       ]
      
      ;;[:p]
      
-     ;;[:button {:class "btn btn-primary btn-block"         :on-click (fn [e] (async/put! event-bus [:select-view :matchdays]))}     "Jetzt tippen"]
+     ;;[:button {:class "btn btn-primary btn-block"         :on-click (fn [e] (async/put! in-ch [:select-view :matchdays]))}     "Jetzt tippen"]
      
      
      ])

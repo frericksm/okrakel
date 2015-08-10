@@ -5,22 +5,21 @@
             [clojure.string]
             [rum :include-macros true]))
 
-(rum/defc title < rum/reactive [conn event-bus]
+(rum/defc title < rum/reactive [conn in-ch]
   (let [db       (rum/react conn)
         av       (od/active-view db)
         loggedIn (not= :login av)]
     (if loggedIn
       [:span
        [:a {:class "icon icon-gear pull-right"
-            :on-click (fn [e] (async/put! event-bus
-                                         [:select-view :settings]))}]  
+            :on-click (fn [e] (async/put! in-ch [:select-view :settings]))}]  
        [:h1 {:class "title" }
         (get-in cu/pages [av :title])]]
       [:span
        [:h1 {:class "title" }
         (get-in cu/pages [av :title])]])))
 
-(rum/defc nav < rum/reactive [conn event-bus]
+(rum/defc nav < rum/reactive [conn in-ch]
   (let [db       (rum/react conn)
         av       (od/active-view db)
         loggedIn (not= :login av)
@@ -39,10 +38,10 @@
          (let [active (= (:page tab) (od/active-view db))
                a-classes (if active "tab-item active" "tab-item")
                icon-classes (clojure.string/join " " ["icon" (:icon tab)])]
-           [:a {:class a-classes
+           [:a {:key (:page tab)
+                :class a-classes
                 :on-click (fn [e] (do  
-                                    (async/put! event-bus
-                                                [:select-view (:page tab)])
+                                    (async/put! in-ch [:select-view (:page tab)])
                                     (.preventDefault e)))}
             [:span {:class icon-classes}]
             [:span {:class "tab-label"} (:label tab)]]))
