@@ -6,7 +6,7 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
 
                  ;; UI
-                 [org.clojure/clojurescript "1.7.48"]
+                 [org.clojure/clojurescript "1.7.58"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
    
                  ;; UI rum
