@@ -9,3 +9,6 @@
 ;; ON PAGE LOAD
 (defn ^:export start []
   (compare-and-set! system-atom nil (component/start (system/system nil))))
+
+
+(start)
