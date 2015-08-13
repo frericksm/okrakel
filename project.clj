@@ -19,6 +19,9 @@
 
                  ;; Components
                  [quile/component-cljs "0.2.4"]
+
+
+                 [secretary "1.2.3"]
 ]
   
   :plugins [[lein-cljsbuild "1.0.6"]]
