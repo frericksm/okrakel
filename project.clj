@@ -20,21 +20,20 @@
                  ;; Components
                  [quile/component-cljs "0.2.4"]
 
-
                  [secretary "1.2.3"]
-]
+                 ]
   
-  :plugins [[lein-cljsbuild "1.0.6"]]
+  :plugins [[lein-cljsbuild "1.0.6"]
+            [lein-figwheel  "0.3.7"]]
 
   :cljsbuild {:builds [{:id "dev"
                         :source-paths ["src"]
-                        :compiler {
-                                   :main  okrakel.app
-                                   :output-to "target/client.js"
-                                   :output-dir "target/client"
+                        :figwheel true
+                        :compiler {:main          okrakel.app
+                                   :output-to     "target/client.js"
+                                   :output-dir    "target/client"
                                    :optimizations :none
-                                   :source-map true
+                                   :source-map    true
                                    ;;:source-map "client.js.map"
                                    ;;:warnings      {:single-segment-namespace false}
-                                   }}]}
-  )
+                                   }}]})
