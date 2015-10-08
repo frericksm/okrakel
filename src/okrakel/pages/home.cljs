@@ -1,6 +1,6 @@
 (ns okrakel.pages.home
   (:require [cljs.core.async :as async]
-            [rum :include-macros true]
+            [rum.core :as rum :include-macros true]
             [okrakel.data :as od]))
 
 (rum/defc view < rum/reactive [conn in-ch]

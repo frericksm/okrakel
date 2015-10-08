@@ -1,6 +1,6 @@
 (ns okrakel.persist
   (:require
-   [datascript :as d]
+   [datascript.core :as d]
    [cognitect.transit :as transit]
    [okrakel.dom :as dom]
    [okrakel.utils :as u]

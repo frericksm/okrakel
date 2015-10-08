@@ -3,7 +3,7 @@
             [okrakel.data :as od]
             [okrakel.contentui :as cu]
             [clojure.string]
-            [rum :include-macros true]))
+            [rum.core :as rum :include-macros true]))
 
 (rum/defc title < rum/reactive [conn in-ch]
   (let [db       (rum/react conn)

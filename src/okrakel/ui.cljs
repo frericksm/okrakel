@@ -1,18 +1,17 @@
 (ns okrakel.ui
   (:require-macros [okrakel.eventbus :refer [go-loop-sub]])
-  (:require
-    [rum :include-macros true]
-    [secretary.core :as secretary :include-macros true]
-    [cljs.core.async :as async]
-    [okrakel.components.core :as comp]
-    [okrakel.eventbus :as e]
-    [okrakel.data :as od]
-    [okrakel.contentui :as cu]
-    [quile.component :as components]
+  (:require [rum.core :as rum :include-macros true]
+            [secretary.core :as secretary :include-macros true]
+            [cljs.core.async :as async]
+            [okrakel.components.core :as comp]
+            [okrakel.eventbus :as e]
+            [okrakel.data :as od]
+            [okrakel.contentui :as cu]
+            [quile.component :as components]
 
-    [goog.events :as events]
-    [goog.history.EventType :as EventType]
-    )
+            [goog.events :as events]
+            [goog.history.EventType :as EventType]
+            )
   (:import goog.History))
 
 ;; -------------------------

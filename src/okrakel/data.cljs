@@ -1,6 +1,6 @@
 (ns okrakel.data
   (:require-macros [okrakel.eventbus :refer [go-loop-sub]])
-  (:require [datascript :as d]
+  (:require [datascript.core :as d]
             [quile.component :as component]
             [okrakel.eventbus :as e]
             [okrakel.database]))

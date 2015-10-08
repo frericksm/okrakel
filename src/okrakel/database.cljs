@@ -1,7 +1,7 @@
 (ns okrakel.database
   (:require
    [quile.component :as component]
-   [datascript :as d]))
+   [datascript.core :as d]))
 
 ;; DB
 (def schema 

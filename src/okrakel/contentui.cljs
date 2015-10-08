@@ -7,7 +7,7 @@
             [okrakel.pages.settings]
             [okrakel.pages.table]
             [okrakel.pages.home]
-            [rum :include-macros true]
+            [rum.core :as rum :include-macros true]
             )
   (:import [goog.events EventType]))
 

@@ -1,5 +1,5 @@
 (ns okrakel.pages.ranking
-  (:require [rum :include-macros true]
+  (:require [rum.core :as rum :include-macros true]
             [cljs.core.async :as async]
             [okrakel.data :as d]))
 

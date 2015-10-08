@@ -1,6 +1,6 @@
 (ns okrakel.utils
   (:require
-    [datascript :as d]))
+    [datascript.core :as d]))
 
 ;; DATASCRIPT
 

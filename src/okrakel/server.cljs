@@ -2,7 +2,7 @@
   (:require
    [cljs.reader]
    [cljs.core.async :as async]
-   [datascript :as d]
+   [datascript.core :as d]
    [okrakel.utils :as u])
   (:import
    [goog.net XhrIo])
